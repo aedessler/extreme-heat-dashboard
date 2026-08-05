@@ -189,6 +189,7 @@ python -m http.server 8123
 | Path | |
 | --- | --- |
 | `index.html` | The entire page: markup, styling, statistics, charts and exports |
+| `climate-brink-logo.webp` | The header mark, embedded in the page as a data URI |
 | `dashboard-series.js` | Generated data the page loads |
 | `dashboard-series.json` | The same payload, for reuse elsewhere |
 | `scripts/metrics.py` | The four metric kernels, shared by every dataset and region |
