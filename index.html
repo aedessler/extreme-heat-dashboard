@@ -126,11 +126,6 @@ svg.chart { display: block; width: 100%; min-width: 640px; height: auto; font-fa
 .window-controls label { display: flex; flex-direction: column; gap: 4px; color: var(--text-muted); font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 700; }
 .window-controls input { width: 7em; padding: 6px 10px; background: var(--surface-1); border: 1px solid var(--gridline); border-radius: 8px; font-size: .88rem; text-transform: none; letter-spacing: 0; }
 
-/* ---- coverage ---- */
-.coverage dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px 22px; margin: 0; }
-.coverage dt { color: var(--text-muted); font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 700; }
-.coverage dd { margin: 3px 0 0; font-family: var(--font-mono); font-size: .82rem; line-height: 1.45; }
-
 .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px 22px; }
 .grid-3 article strong { display: block; margin-bottom: 4px; font-family: var(--font-display); font-size: .76rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); }
 .grid-3 article p { margin: 0; color: var(--text-secondary); font-size: .89rem; }
@@ -152,7 +147,6 @@ footer.site { margin-top: 24px; color: var(--text-muted); font-size: .82rem; }
   </div>
   <nav class="topnav" aria-label="Sections">
     <a href="#variables">Variables</a>
-    <a href="#coverage-panel">Coverage</a>
     <a href="#detection">Detection</a>
     <a href="#methodology">Methodology</a>
     <a href="#sources">Data &amp; reproducibility</a>
@@ -187,13 +181,6 @@ footer.site { margin-top: 24px; color: var(--text-muted); font-size: .82rem; }
 </section>
 
 <div id="metric-panels"></div>
-
-<section class="panel coverage" id="coverage-panel">
-  <h2>What this data actually covers</h2>
-  <p class="caption" id="coverage-intro"></p>
-  <dl id="coverage-list"></dl>
-  <p class="note caution" id="coverage-warning" style="margin-top:14px"></p>
-</section>
 
 <section class="panel" id="detection">
   <h2>Detection</h2>
@@ -912,65 +899,6 @@ function renderSummary() {
   }
 }
 
-function renderCoverage() {
-  const series = getSeries(state.dataset, state.region, DATA.metricOrder[0]);
-  const coverage = series.coverage;
-  document.getElementById("coverage-intro").textContent =
-    `${DATA.datasets[state.dataset].label}, ${DATA.regions[state.region].label}. ` +
-    `All four variables above use this same set of sites.`;
-
-  const list = document.getElementById("coverage-list");
-  list.replaceChildren();
-  const add = (term, value) => {
-    const cell = document.createElement("div");
-    const dt = document.createElement("dt"); dt.textContent = term;
-    const dd = document.createElement("dd"); dd.textContent = value;
-    cell.append(dt, dd);
-    list.appendChild(cell);
-  };
-  add(coverage.siteLabel.replace(/^./, (c) => c.toUpperCase()), coverage.sites.toLocaleString());
-  add("Occupied 2° cells", coverage.occupiedCells.toLocaleString());
-  if (coverage.landCellsSampled != null) {
-    add("Land cells reached",
-      `${coverage.landCellsSampled.toLocaleString()} of ${coverage.landCellsTotal.toLocaleString()}` +
-      ` (${(coverage.landAreaFraction * 100).toFixed(0)}% of land area)`);
-  }
-  add(`Share of ${coverage.domain}`, `${(coverage.areaFraction * 100).toFixed(1)}%`);
-  if (coverage.weightShareByCountry) {
-    add("Area weight by country",
-      coverage.weightShareByCountry.map((e) => `${e.country} ${(e.share * 100).toFixed(0)}%`).join(" · "));
-  }
-  add("Sites by latitude",
-    coverage.sitesByLatitudeBand.filter((e) => e.sites > 0).map((e) => `${e.band} ${e.sites}`).join(" · "));
-  add("Sites by longitude",
-    coverage.sitesByLongitudeBand.filter((e) => e.sites > 0).map((e) => `${e.band}° ${e.sites}`).join(" · "));
-
-  const warning = document.getElementById("coverage-warning");
-  if (state.region === "nh" && coverage.weightShareByCountry) {
-    const us = coverage.weightShareByCountry.find((e) => e.country === "US");
-    warning.textContent =
-      `These values are area-weighted, but weighting cannot invent coverage. Qualifying long ` +
-      `GHCN records reach only ` +
-      (coverage.landCellsSampled != null
-        ? `${coverage.landCellsSampled.toLocaleString()} of this band's ` +
-          `${coverage.landCellsTotal.toLocaleString()} land cells, and `
-        : "a small share of this band's land cells, and ") +
-      `the US still carries ${us ? (us.share * 100).toFixed(0) : "most"}% of the area weight. ` +
-      `The hemispheric station series therefore tracks CONUS closely and is not an independent ` +
-      `check on it. Berkeley Earth covers every land cell in the band and does not have this problem.`;
-  } else if (state.region === "nh") {
-    warning.textContent =
-      `Berkeley Earth's land grid covers this band evenly at every longitude. The GHCN ` +
-      `station network does not — its qualifying long records are concentrated in North ` +
-      `America, which is why no hemispheric station series is offered here and this grid is ` +
-      `the only estimate for the band.`;
-  } else {
-    warning.textContent =
-      `All four variables share one set of sites within CONUS, so differences between the ` +
-      `panels are differences between the metrics rather than between station sets.`;
-  }
-}
-
 function renderStaticSections() {
   const grid = document.getElementById("method-grid");
   const m = DATA.method;
@@ -1006,7 +934,6 @@ function render() {
     panel.hidden = !series;
     if (series) renderPanel(panel, metric);
   }
-  renderCoverage();
 }
 
 renderStaticSections();
