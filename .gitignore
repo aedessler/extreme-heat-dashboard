@@ -1,0 +1,7 @@
+# Cached NOAA per-station downloads, roughly 2 GB.
+# Rebuild with: python scripts/build_dashboard_data.py
+/cache/
+
+__pycache__/
+*.pyc
+.DS_Store
