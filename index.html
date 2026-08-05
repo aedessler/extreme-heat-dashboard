@@ -217,7 +217,6 @@ footer.site { margin-top: 24px; color: var(--text-muted); font-size: .82rem; }
     Berkeley Earth.
   </p>
   <div class="grid-3" id="method-grid"></div>
-  <p class="caption" style="margin:16px 0 0" id="method-note"></p>
 </section>
 
 <section class="panel" id="sources">
@@ -240,8 +239,7 @@ footer.site { margin-top: 24px; color: var(--text-muted); font-size: .82rem; }
 
 <footer class="site">
   Heat Wave Index after Kunkel et al. (1999), CCSP (2008), EPA (2021). TXx, WSDI and TN90p follow
-  ETCCDI/CLIMDEX definitions. Layout and the p &lt; 0.10 likelihood threshold follow the US Extreme
-  Weather and Climate Change Dashboard; that site's additional magnitude test is not applied here.
+  ETCCDI/CLIMDEX definitions. Detection uses the IPCC's example p &lt; 0.10 likelihood threshold.
 </footer>
 
 </div>
@@ -579,7 +577,7 @@ function drawChart(svg, metric) {
       x2: xs(end), y2: ys(a.intercept + a.slope * end) }));
   }
 
-  // Latest observed value, called out at the right edge as on the reference page.
+  // Latest observed value, called out at the right edge.
   const latest = main[main.length - 1];
   if (latest) {
     svg.appendChild(el("circle", { class: "latest-dot", cx: xs(latest.x), cy: ys(latest.y), r: 3.6 }));
@@ -988,10 +986,6 @@ function renderStaticSections() {
     article.append(strong, p);
     grid.appendChild(article);
   }
-  document.getElementById("method-note").textContent =
-    `The reference dashboard also carries two NOAA nClimGrid-Daily variables. That homogenized ` +
-    `gridded product is not part of this repository, so those panels are not reproduced here; ` +
-    `Berkeley Earth plays the equivalent role as the homogenized, gridded comparison.`;
   document.getElementById("build-stamp").textContent =
     `Series data generated ${DATA.generated}. Study period ${m.startYear}–${m.endYear}; ` +
     `${m.gridDegrees}° weighting grid; percentile reference period ` +

@@ -157,11 +157,11 @@ class DashboardDataTests(unittest.TestCase):
                 if dataset == "berkeley":
                     self.assertEqual(coverage["landCellsSampled"], coverage["landCellsTotal"])
 
-    # -- agreement with the repository's published results ---------------
+    # -- agreement with the parent project's published results -----------
     def test_detection_is_mann_kendall_significance_alone(self):
-        # The IPCC's example likelihood threshold. The reference dashboard also
-        # applies a magnitude-versus-variability check; this page does not, so
-        # no magnitude parameter should be present to imply otherwise.
+        # The IPCC's example likelihood threshold. Detection is significance
+        # alone, with no magnitude-versus-variability check, so no magnitude
+        # parameter should be present to imply otherwise.
         self.assertEqual(self.data["detection"]["pThreshold"], 0.10)
         self.assertEqual(self.data["detection"]["test"], "Mann-Kendall")
         self.assertNotIn("magnitudeFraction", self.data["detection"])

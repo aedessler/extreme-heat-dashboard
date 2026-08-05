@@ -503,9 +503,9 @@ def _payload_skeleton() -> dict:
             "percentileWindowDays": M.WINDOW,
             "minimumSpellDays": M.MIN_RUN,
         },
-        # Detection is Mann-Kendall significance alone. The reference dashboard
-        # pairs it with a magnitude-versus-variability check; that second test
-        # is deliberately not applied here.
+        # Detection is Mann-Kendall significance alone: no magnitude-versus-
+        # variability check, so no magnitude parameter belongs in here to imply
+        # otherwise. A test asserts it stays absent.
         "detection": {
             "pThreshold": 0.10,
             "test": "Mann-Kendall",
