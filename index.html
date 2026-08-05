@@ -195,7 +195,7 @@ footer.site { margin-top: 24px; color: var(--text-muted); font-size: .82rem; }
     against a background of internal variability:
   </p>
   <div class="grid-3">
-    <article><strong>Likelihood</strong><p>Mann&ndash;Kendall two-sided p &lt; 0.10 &mdash; the IPCC's example threshold rather than the conventional 0.05. The reported rate is the Theil&ndash;Sen slope.</p></article>
+    <article><strong>Likelihood</strong><p>Mann&ndash;Kendall two-sided p &lt; 0.10. The reported rate is the Theil&ndash;Sen slope.</p></article>
     <article><strong>Recomputed per window</strong><p>The test runs on whatever window you select, so narrowing the window changes both the slope and the verdict.</p></article>
     <article><strong>Dataset dependent</strong><p>Where GHCN and Berkeley Earth reach different verdicts for the same variable and region, the summary reports <em>dataset dependent</em> rather than picking a winner.</p></article>
   </div>
@@ -868,7 +868,7 @@ function renderSummary() {
   body.replaceChildren();
   document.getElementById("variables-intro").textContent =
     `Each variable is evaluated over its selected window with the Mann–Kendall test at the ` +
-    `IPCC's p < ${P_THRESHOLD.toFixed(2)} likelihood threshold. ` +
+    `p < ${P_THRESHOLD.toFixed(2)} likelihood threshold. ` +
     `Findings shown for ${DATA.datasets[state.dataset].label}, ${DATA.regions[state.region].label}. ` +
     `Where the two datasets disagree for a variable, the finding reads "dataset dependent".`;
 
