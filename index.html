@@ -79,6 +79,12 @@ h4 { margin: 0 0 8px; font-family: var(--font-display); font-size: .76rem; text-
 .segmented button { padding: 7px 16px; background: none; border: 0; border-radius: 999px; color: var(--text-secondary); cursor: pointer; font-size: .87rem; font-weight: 600; white-space: nowrap; }
 .segmented button[aria-pressed="true"] { background: var(--text-primary); color: var(--page); }
 .segmented button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* The source belongs with the dataset control that chooses it, not repeated
+   down a table column where all four rows say the same thing. */
+.switch-source { flex-basis: 100%; display: flex; align-items: baseline; gap: 10px; margin: 2px 0 0; padding-top: 15px; border-top: 1px solid var(--hairline); }
+.switch-source > span { flex: none; color: var(--text-muted); font-size: .7rem; text-transform: uppercase; letter-spacing: .07em; font-weight: 700; }
+.switch-source a { color: var(--text-primary); font-size: .95rem; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--hairline); }
+.switch-source a:hover, .switch-source a:focus-visible { color: var(--accent); text-decoration-color: currentColor; }
 .switch-note { flex-basis: 100%; margin: 0; color: var(--text-muted); font-size: .84rem; }
 
 /* ---- summary table ---- */
@@ -87,15 +93,13 @@ table.summary { width: 100%; border-collapse: collapse; font-size: .92rem; }
 table.summary th, table.summary td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--hairline); vertical-align: top; }
 table.summary th { background: var(--surface-2); color: var(--text-secondary); font-family: var(--font-display); text-transform: uppercase; letter-spacing: .04em; font-size: .72rem; font-weight: 700; }
 table.summary tbody tr:last-child td { border-bottom: 0; }
-table.summary td:first-child { width: 36%; }
+table.summary td:first-child { width: 44%; }
 .var-link { padding: 0; background: none; border: 0; color: inherit; text-align: left; cursor: pointer; font: inherit; font-weight: 600; }
 .var-link:hover, .var-link:focus-visible { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .finding { font-weight: 700; }
 .finding.detected { color: var(--accent); }
 .finding.none { color: var(--text-secondary); }
 .finding-note { display: block; margin-top: 3px; color: var(--text-muted); font-family: var(--font-mono); font-size: .76rem; font-weight: 400; }
-.src { color: var(--text-secondary); font-size: .8rem; line-height: 1.45; }
-.src a { color: var(--text-secondary); text-decoration: underline dotted; text-underline-offset: 3px; }
 
 /* ---- metric panels ---- */
 .note { margin: 0 0 14px; padding: 12px 16px; border-radius: 6px; font-size: .89rem; line-height: 1.55; }
@@ -162,6 +166,7 @@ footer.site { margin-top: 24px; color: var(--text-muted); font-size: .82rem; }
       <span id="region-label">Region</span>
       <div class="segmented" role="group" aria-labelledby="region-label" id="region-switch"></div>
     </div>
+    <p class="switch-source" id="switch-source"></p>
     <p class="switch-note" id="switch-note"></p>
   </div>
 </section>
@@ -171,7 +176,7 @@ footer.site { margin-top: 24px; color: var(--text-muted); font-size: .82rem; }
   <p class="caption" id="variables-intro"></p>
   <div class="table-wrap">
     <table class="summary">
-      <thead><tr><th scope="col">Variable</th><th scope="col">Finding</th><th scope="col">Source</th></tr></thead>
+      <thead><tr><th scope="col">Variable</th><th scope="col">Finding</th></tr></thead>
       <tbody id="summary-body"></tbody>
     </table>
   </div>
@@ -849,6 +854,17 @@ function renderSwitcher() {
     .filter((id) => !available(id, state.region))
     .map((id) => `${DATA.datasets[id].label} is not offered for this region: ` +
                  excludedReason(id, state.region));
+  // Every metric in a cell comes from one source, so it is stated once here
+  // rather than repeated on each row of the summary table.
+  const label = document.createElement("span");
+  label.textContent = "Source";
+  const link = document.createElement("a");
+  link.href = series.sourceUrl;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.textContent = series.source;
+  document.getElementById("switch-source").replaceChildren(label, link);
+
   document.getElementById("switch-note").textContent =
     [`${DATA.regions[state.region].blurb} ${detail}`, ...missing].join(" ");
 }
@@ -887,11 +903,7 @@ function renderSummary() {
     note.textContent = finding.note;
     findingCell.append(label, note);
 
-    const sourceCell = document.createElement("td");
-    sourceCell.className = "src";
-    sourceCell.textContent = series.source;
-
-    row.append(nameCell, findingCell, sourceCell);
+    row.append(nameCell, findingCell);
     body.appendChild(row);
   }
 }
