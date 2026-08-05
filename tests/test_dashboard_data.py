@@ -159,9 +159,9 @@ class DashboardDataTests(unittest.TestCase):
 
     # -- agreement with the parent project's published results -----------
     def test_detection_is_mann_kendall_significance_alone(self):
-        # The IPCC's example likelihood threshold. Detection is significance
-        # alone, with no magnitude-versus-variability check, so no magnitude
-        # parameter should be present to imply otherwise.
+        # A 10% likelihood threshold. Detection is significance alone, with no
+        # magnitude-versus-variability check, so no magnitude parameter should
+        # be present to imply otherwise.
         self.assertEqual(self.data["detection"]["pThreshold"], 0.10)
         self.assertEqual(self.data["detection"]["test"], "Mann-Kendall")
         self.assertNotIn("magnitudeFraction", self.data["detection"])

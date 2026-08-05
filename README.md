@@ -53,10 +53,10 @@ record and much weaker in the Berkeley grid.
 
 ## Change detection
 
-A change is called **detected** when the Mann–Kendall two-sided p < 0.10 — the IPCC's
-example threshold rather than the conventional 0.05. The reported rate is the Theil–Sen
-slope. The test recomputes for whatever window you select, so narrowing the window changes
-both the slope and the verdict.
+A change is called **detected** when the Mann–Kendall two-sided p < 0.10, a 10% threshold
+rather than the conventional 5%. The reported rate is the Theil–Sen slope. The test
+recomputes for whatever window you select, so narrowing the window changes both the slope
+and the verdict.
 
 Significance is not the same as importance, so each chart still draws the 66% and 90%
 historical range bands: a trend can clear p < 0.10 while remaining small against ordinary
