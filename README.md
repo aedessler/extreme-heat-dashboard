@@ -42,8 +42,9 @@ Over the full 1900–2024 record, with Mann–Kendall at p < 0.10:
 
 Berkeley Earth detects an increase in all eight of its metrics. GHCN CONUS detects two of
 four: TXx shows essentially no monotonic trend across the full record, and WSDI lands just
-the wrong side of the threshold at p=0.103. Those two therefore read **dataset dependent**
-in the summary table.
+the wrong side of the threshold at p=0.103. Each dataset and region is tested on its own,
+so those two read **no trend detected** with GHCN-Daily selected and **detected change**
+with Berkeley Earth; the summary always describes the series on screen.
 
 Set the window to 1970–2024 and **every cell detects an increase**, all at p ≤ 0.003. The
 disagreement is not about whether recent decades have warmed; it is about how much a

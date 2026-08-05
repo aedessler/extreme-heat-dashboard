@@ -93,7 +93,6 @@ table.summary td:first-child { width: 36%; }
 .finding { font-weight: 700; }
 .finding.detected { color: var(--accent); }
 .finding.none { color: var(--text-secondary); }
-.finding.mixed { color: var(--caution-edge); }
 .finding-note { display: block; margin-top: 3px; color: var(--text-muted); font-family: var(--font-mono); font-size: .76rem; font-weight: 400; }
 .src { color: var(--text-secondary); font-size: .8rem; line-height: 1.45; }
 .src a { color: var(--text-secondary); text-decoration: underline dotted; text-underline-offset: 3px; }
@@ -197,7 +196,7 @@ footer.site { margin-top: 24px; color: var(--text-muted); font-size: .82rem; }
   <div class="grid-3">
     <article><strong>Likelihood</strong><p>Mann&ndash;Kendall two-sided p &lt; 0.10. The reported rate is the Theil&ndash;Sen slope.</p></article>
     <article><strong>Recomputed per window</strong><p>The test runs on whatever window you select, so narrowing the window changes both the slope and the verdict.</p></article>
-    <article><strong>Dataset dependent</strong><p>Where GHCN and Berkeley Earth reach different verdicts for the same variable and region, the summary reports <em>dataset dependent</em> rather than picking a winner.</p></article>
+    <article><strong>Per dataset and region</strong><p>Each combination is tested on its own and the verdict describes only the series on screen. GHCN and Berkeley Earth can reach different verdicts for the same variable; switch between them to see it.</p></article>
   </div>
   <p class="caption" style="margin:14px 0 0">
     Significance is not the same as importance. Each chart also draws the 66% and 90%
@@ -239,7 +238,7 @@ footer.site { margin-top: 24px; color: var(--text-muted); font-size: .82rem; }
 
 <footer class="site">
   Heat Wave Index after Kunkel et al. (1999), CCSP (2008), EPA (2021). TXx, WSDI and TN90p follow
-  ETCCDI/CLIMDEX definitions. Detection uses the IPCC's example p &lt; 0.10 likelihood threshold.
+  ETCCDI/CLIMDEX definitions. Detection uses p &lt; 0.10 likelihood threshold.
 </footer>
 
 </div>
@@ -287,10 +286,6 @@ const key = (dataset, region, metric) => `${dataset}_${region}_${metric}`;
 const getSeries = (dataset, region, metric) => DATA.series[key(dataset, region, metric)] ?? null;
 const available = (dataset, region) => DATA.availableCells.includes(`${dataset}_${region}`);
 const excludedReason = (dataset, region) => DATA.excludedCells?.[`${dataset}_${region}`] ?? "";
-
-/** The other dataset, but only when it exists for the current region. */
-const otherDataset = (dataset, region = state.region) =>
-  DATA.datasetOrder.find((id) => id !== dataset && available(id, region)) ?? null;
 
 /* ------------------------------ statistics ------------------------------ */
 function median(values) {
@@ -398,22 +393,17 @@ const pointsIn = (series, [start, end]) =>
 /* ------------------------------ formatting ----------------------------- */
 const fmt = (value, metric) => value.toFixed(DATA.metrics[metric].decimals);
 
+/* The verdict describes the selected series and nothing else: the other dataset
+   is not consulted, so switching dataset or region can change it. */
 function findingFor(metric) {
   const here = assess(pointsIn(getSeries(state.dataset, state.region, metric), windowFor(metric)));
-  const other = getSeries(otherDataset(state.dataset), state.region, metric);
-  const there = other ? assess(pointsIn(other, windowFor(metric) ?? other.reliableWindow)) : null;
   if (!here) return { label: "Insufficient data", cls: "none", note: "" };
 
-  const disagrees = there && (there.detected !== here.detected ||
-    (there.detected && here.detected && there.direction !== here.direction));
   const note = `Mann–Kendall p=${here.p.toFixed(3)} · ${here.n} points, ${here.first}–${here.last}`;
-  if (disagrees) {
-    return { label: "Dataset dependent", cls: "mixed", note, assessment: here };
-  }
   return here.detected
     ? { label: `Detected change — ${here.direction === "increasing" ? "▲" : "▼"} ${here.direction[0].toUpperCase()}${here.direction.slice(1)}`,
         cls: "detected", note, assessment: here }
-    : { label: "No detected change", cls: "none", note, assessment: here };
+    : { label: "No trend detected", cls: "none", note, assessment: here };
 }
 
 /** Plain-language explanation of the verdict. */
@@ -429,7 +419,7 @@ function findingSentence(a, metric, series) {
       `Mann–Kendall p=${a.p.toFixed(3)} clears the IPCC's detection threshold ` +
       `(likelihood by chance <${(P_THRESHOLD * 100).toFixed(0)}%). ${basis}`;
   }
-  return `No detected change: the fit is ${a.direction} at ${perDecade}, a fitted change of ` +
+  return `No trend detected: the fit is ${a.direction} at ${perDecade}, a fitted change of ` +
     `${total}, but Mann–Kendall p=${a.p.toFixed(3)} does not clear the IPCC's detection ` +
     `threshold (likelihood by chance <${(P_THRESHOLD * 100).toFixed(0)}%). ${basis}`;
 }
@@ -869,8 +859,8 @@ function renderSummary() {
   document.getElementById("variables-intro").textContent =
     `Each variable is evaluated over its selected window with the Mann–Kendall test at the ` +
     `p < ${P_THRESHOLD.toFixed(2)} likelihood threshold. ` +
-    `Findings shown for ${DATA.datasets[state.dataset].label}, ${DATA.regions[state.region].label}. ` +
-    `Where the two datasets disagree for a variable, the finding reads "dataset dependent".`;
+    `Each finding describes ${DATA.datasets[state.dataset].label}, ${DATA.regions[state.region].label} ` +
+    `alone; switching dataset or region re-runs the test and can change the verdict.`;
 
   for (const metric of DATA.metricOrder) {
     const series = getSeries(state.dataset, state.region, metric);
