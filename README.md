@@ -1,9 +1,6 @@
 # Heat Waves Dashboard
 
-An interactive version of this repository's heat-metric figures, laid out like the
-heat-waves page of the [US Extreme Weather and Climate Change
-Dashboard](https://extremeweather.thehonestbroker.org/heat-waves/) and using that site's
-published change-detection rule.
+An interactive dashboard of heat-metric figures.
 
 **Live: https://aedessler.github.io/extreme-heat-dashboard/**
 
@@ -19,7 +16,7 @@ the page:
 
 | | CONUS | NH land, 24–50°N |
 | --- | --- | --- |
-| **GHCN-Daily** | 1,266 stations, FLs.52j-adjusted, area-weighted | *not offered — see below* |
+| **GHCN-Daily** | 1,266 stations, FLs.52j-adjusted, area-weighted | *not available* |
 | **Berkeley Earth** | 281 land grid points | 1,140 land grid points |
 
 - **Heat Wave Index** — events per site per year (EPA/Kunkel)
@@ -32,37 +29,6 @@ CONUS included. That is the same latitude band as the CONUS box, so the comparis
 latitude fixed and varies only longitude — and it is exactly the band the Berkeley Earth
 `preprocessed_nh_*` files were built for.
 
-### Why there is no hemispheric GHCN series
-
-GHCN aggregation *is* area-weighted, by the repository's own
-`temperature_data.area_weights` — `cos(lat) / stations-per-2°-cell`, which averages
-stations within a cell and then combines cells in proportion to area. That is
-algebraically the same two-stage scheme Berkeley uses; Berkeley skips the first stage only
-because it is already a grid.
-
-But weighting can only redistribute among cells that contain stations, and in this band
-GHCN barely has any outside the US. Using Berkeley's land mask as the denominator on the
-same 2° grid:
-
-| Cell | Land cells reached |
-| --- | --- |
-| GHCN CONUS | 220 / 281 (78% of land area) |
-| GHCN 24–50°N band | 274 / 1,140 (23%) |
-| — outside CONUS | **60 / 873 (6.9%)** |
-| Berkeley CONUS | 281 / 281 |
-| Berkeley 24–50°N band | 1,140 / 1,140 |
-
-A hemispheric GHCN series built this way keeps 78% of its area weight in the US and
-correlates **0.962** with the CONUS box of the same raw stations — it is CONUS wearing a
-hemisphere label. Coarsening the weighting grid moves the number without fixing the
-problem (10° cells drop the US share to 50% and the correlation to 0.65, but then a single
-station stands in for a 10°×10° region). So the cell is not built at all, and the page
-disables the control and says why. Berkeley Earth is the hemispheric option.
-
-One more thing worth stating plainly: the FLs.52j homogeneity offsets exist only for US
-stations, so even a raw hemispheric GHCN series could never have been homogenized. That is
-a second, independent reason Berkeley Earth is the right instrument for the band.
-
 ## What the data says
 
 Over the full 1900–2024 record, with Mann–Kendall at p < 0.10:
@@ -74,10 +40,10 @@ Over the full 1900–2024 record, with Mann–Kendall at p < 0.10:
 | WSDI | no (p=0.103) | **detected** (p<0.001) | **detected** (p<0.001) |
 | TN90p | **detected** (p<0.001) | **detected** (p<0.001) | **detected** (p<0.001) |
 
-Berkeley Earth detects an increase in all eight of its cells. GHCN CONUS detects two of
+Berkeley Earth detects an increase in all eight of its metrics. GHCN CONUS detects two of
 four: TXx shows essentially no monotonic trend across the full record, and WSDI lands just
 the wrong side of the threshold at p=0.103. Those two therefore read **dataset dependent**
-in the summary table, which is the reference site's own label for exactly this situation.
+in the summary table.
 
 Set the window to 1970–2024 and **every cell detects an increase**, all at p ≤ 0.003. The
 disagreement is not about whether recent decades have warmed; it is about how much a
@@ -90,11 +56,6 @@ A change is called **detected** when the Mann–Kendall two-sided p < 0.10 — t
 example threshold rather than the conventional 0.05. The reported rate is the Theil–Sen
 slope. The test recomputes for whatever window you select, so narrowing the window changes
 both the slope and the verdict.
-
-The [reference dashboard](https://extremeweather.thehonestbroker.org/methodology) pairs
-that likelihood test with a second, magnitude-versus-variability criterion — the fitted
-change must reach 25% of the variable's 5th-to-95th percentile spread. **That second test
-is deliberately not applied here.** Detection on this page is significance alone.
 
 Significance is not the same as importance, so each chart still draws the 66% and 90%
 historical range bands: a trend can clear p < 0.10 while remaining small against ordinary
@@ -137,10 +98,11 @@ support, not an error in either dataset, and the affected panels say so. It is a
 detection rule — which is scale-free, comparing a trend with that series' own variability —
 is the right basis for comparing the two.
 
-### Agreement with the repository's published results
+### Agreement with published results
 
-Three cells can be checked against files this repository already publishes, and all three
-match to the precision those files are stored at:
+Three cells can be checked against files the parent project
+([GHCN-daily-US-corrected](https://github.com/aedessler/GHCN-daily-US-corrected)) already
+publishes, and all three match to the precision those files are stored at:
 
 | Series | Reference | Agreement |
 | --- | --- | --- |
@@ -151,11 +113,11 @@ match to the precision those files are stored at:
 WSDI additionally reproduces `plot_modules/wsdi.py` bit for bit. TN90p has no existing
 reference implementation here, but shares the verified threshold machinery with WSDI.
 
-### Not reproduced
+### Not included
 
-The reference page also carries WSDI and TXx from NOAA nClimGrid-Daily. That homogenized
-gridded product is not part of this repository, so those two panels are absent; Berkeley
-Earth plays the equivalent role as the homogenized, gridded comparison.
+NOAA's nClimGrid-Daily would be a natural third dataset here, being both homogenized and
+gridded, but it is not part of the parent project, so it is absent. Berkeley Earth plays
+that role instead.
 
 ## Rebuilding the data
 
