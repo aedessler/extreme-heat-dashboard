@@ -186,8 +186,7 @@ footer.site { margin-top: 24px; color: var(--text-muted); font-size: .82rem; }
   <h2>Detection</h2>
   <p class="caption">
     A change is called <strong>detected</strong> when the Mann&ndash;Kendall test finds the
-    trend unlikely to have arisen by chance, following the IPCC's framing of detection
-    against a background of internal variability:
+    trend unlikely to have arisen by chance against a background of internal variability:
   </p>
   <div class="grid-3">
     <article><strong>Likelihood</strong><p>Mann&ndash;Kendall two-sided p &lt; 0.10. The reported rate is the Theil&ndash;Sen slope.</p></article>
@@ -412,12 +411,12 @@ function findingSentence(a, metric, series) {
 
   if (a.detected) {
     return `Detected change: ${a.direction} at ${perDecade}, a fitted change of ${total}. ` +
-      `Mann–Kendall p=${a.p.toFixed(3)} clears the IPCC's detection threshold ` +
-      `(likelihood by chance <${(P_THRESHOLD * 100).toFixed(0)}%). ${basis}`;
+      `Mann–Kendall p=${a.p.toFixed(3)} clears the ` +
+      `${(P_THRESHOLD * 100).toFixed(0)}% threshold. ${basis}`;
   }
   return `No trend detected: the fit is ${a.direction} at ${perDecade}, a fitted change of ` +
-    `${total}, but Mann–Kendall p=${a.p.toFixed(3)} does not clear the IPCC's detection ` +
-    `threshold (likelihood by chance <${(P_THRESHOLD * 100).toFixed(0)}%). ${basis}`;
+    `${total}, but Mann–Kendall p=${a.p.toFixed(3)} does not clear the ` +
+    `${(P_THRESHOLD * 100).toFixed(0)}% threshold. ${basis}`;
 }
 
 /* Point stations and 2° grid cells do not measure the same thing. Averaging over
